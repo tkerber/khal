@@ -34,6 +34,7 @@ from .base import Pane, Window, CColumns, CPile, CSimpleFocusListWalker, Choice
 from .widgets import ExtendedEdit as Edit
 from .startendeditor import StartEndEditor
 from .calendarwidget import CalendarWidget
+from .editor import external_editor
 
 
 NOREPEAT = 'No'
