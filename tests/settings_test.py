@@ -120,7 +120,7 @@ class TestSettings(object):
                 'print_new': 'False',
                 'show_all_days': False,
                 'days': 2,
-                'edit_mode': 'ikhal',
+                'edit_mode': 'template',
                 'editor': '/usr/bin/vim',
             }
         }
