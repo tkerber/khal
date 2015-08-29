@@ -135,6 +135,16 @@ days = integer(default=2)
 # event in text form, the path to where the event is now saved or nothing?
 print_new = option('event', 'path', 'False', default=False)
 
+# Set the mode of editing events. 'ikhal' is the default and uses khal's default
+# editor. Template uses you editor (see editor setting next) and opens the event
+# in a formatted template. 'raw' allows you to use your default editor to edit
+# raw .ics files
+edit_mode = option('ikhal', 'template', 'raw', '', default='ikhal')
+
+# path to editor to use for editing events
+# if None defaults to $EDITOR
+editor = string(default='$EDITOR')
+
 # The view section contains config options that effect the visual appearance
 # when using ikhal
 [view]

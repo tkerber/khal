@@ -247,6 +247,13 @@ class EventColumn(urwid.WidgetWrap):
             self.pane.window.backtrack()
 
         assert not self.editor
+
+        # if an external editor is set - use it
+        if self.pane.conf['default']['edit_mode'] == 'template':
+            xeditor = self.pane.conf['default']['editor']
+            external_editor(xeditor, event, self.events.events)
+            return
+
         self.editor = True
         editor = EventEditor(self.pane, event)
         current_day = self.container.contents[0][0]
