@@ -42,6 +42,8 @@ class TestSettings(object):
                 'show_all_days': False,
                 'print_new': 'False',
                 'days': 2,
+                'edit_mode': 'ikhal',
+                'editor': None,
             }
         }
         for key in comp_config:
@@ -81,10 +83,50 @@ class TestSettings(object):
                 'print_new': 'False',
                 'show_all_days': False,
                 'days': 2,
+                'edit_mode': 'ikhal',
+                'editor': None,
             }
         }
         for key in comp_config:
             assert config[key] == comp_config[key]
+
+    def test_editor(self):
+        config = get_config(PATH + 'editor.conf')
+        comp_config = {
+            'calendars': {
+                'home': {'path': os.path.expanduser('~/.calendars/home/'),
+                         'color': 'dark green', 'readonly': False,
+                         'type': 'calendar'},
+                'work': {'path': os.path.expanduser('~/.calendars/work/'),
+                         'readonly': True, 'color': '',
+                         'type': 'calendar'}},
+            'sqlite': {'path': os.path.expanduser('~/.local/share/khal/khal.db')},
+            'locale': {
+                'local_timezone': get_localzone(),
+                'default_timezone': get_localzone(),
+                'timeformat': '%H:%M',
+                'dateformat': '%d.%m.',
+                'longdateformat': '%d.%m.%Y',
+                'datetimeformat': '%d.%m. %H:%M',
+                'longdatetimeformat': '%d.%m.%Y %H:%M',
+                'firstweekday': 0,
+                'encoding': 'utf-8',
+                'unicode_symbols': True,
+                'weeknumbers': False,
+            },
+            'default': {
+                'default_calendar': None,
+                'default_command': 'calendar',
+                'print_new': 'False',
+                'show_all_days': False,
+                'days': 2,
+                'edit_mode': 'ikhal',
+                'editor': '/usr/bin/vim',
+            }
+        }
+        for key in comp_config:
+            assert config[key] == comp_config[key]
+
 
     def test_old_config(self, tmpdir):
         old_config = """
