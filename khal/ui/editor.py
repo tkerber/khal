@@ -1,4 +1,6 @@
-import tempfile, subprocess, os
+import tempfile
+import subprocess
+import os
 
 def external_editor(editor, event, current_day):
     # get event template

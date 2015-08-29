@@ -25,6 +25,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time
 import signal
 import sys
+import os
 
 import urwid
 
@@ -252,6 +253,8 @@ class EventColumn(urwid.WidgetWrap):
         # if an external editor is set - use it
         if self.pane.conf['default']['edit_mode'] == 'template':
             xeditor = self.pane.conf['default']['editor']
+            if not xeditor:
+                xeditor = os.getenv('EDITOR')
             external_editor(xeditor, event, self.events.events)
             return
 

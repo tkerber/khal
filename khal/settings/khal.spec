@@ -142,8 +142,9 @@ print_new = option('event', 'path', 'False', default=False)
 edit_mode = option('ikhal', 'template', 'raw', '', default='ikhal')
 
 # path to editor to use for editing events
-# if None defaults to $EDITOR
-editor = string(default='$EDITOR')
+# if None (default), will use the value of $EDITOR
+# only applicable if 'template' or 'raw' are set, otherwise ignored
+editor = string(default=None)
 
 # The view section contains config options that effect the visual appearance
 # when using ikhal
