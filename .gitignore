@@ -11,3 +11,7 @@ dist/
 .coverage
 .cache
 htmlcov
+bin/
+include/
+lib/
+pip-selfcheck.json
