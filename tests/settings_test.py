@@ -127,7 +127,6 @@ class TestSettings(object):
         for key in comp_config:
             assert config[key] == comp_config[key]
 
-
     def test_old_config(self, tmpdir):
         old_config = """
 [Calendar home]
