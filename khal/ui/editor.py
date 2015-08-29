@@ -1,6 +1,8 @@
 import tempfile
 import subprocess
 import os
+import sys
+
 
 def external_editor(editor, event, current_day):
     # get event template
@@ -11,8 +13,9 @@ def external_editor(editor, event, current_day):
     tf.write(old_template)
     tf.close()
     # start editor to edit template
-    child = subprocess.Popen([editor, temp_file_name])
-    streamdata = child.communicate()[0]
+    # child = subprocess.Popen([editor, temp_file_name])
+    subprocess.Popen([editor, temp_file_name])
+    # streamdata = child.communicate()[0]
     # read temp file contents after editing
     tf = open(temp_file_name, "r")
     new_template = tf.read()
@@ -28,6 +31,7 @@ def external_editor(editor, event, current_day):
             return
             # add event
 
+
 def get_agenda(current_day):
     """convert current_day to commented string
 
@@ -41,7 +45,6 @@ def get_agenda(current_day):
     return '\n'.join(agenda)
 
 
-
 def edit_template(event, current_day):
     agenda = get_agenda(current_day)
 # Calendar: %s
@@ -51,7 +54,7 @@ def edit_template(event, current_day):
     else:
         freq = ''
         until = ''
-            
+
     return """# Edit Event
 # if you want to cancel, exit without saving
 
@@ -86,9 +89,10 @@ Repeat: %s
 
 # will throw an error if Repeat is not set
 # if set, must be set to a valid date or longdate format
-Until: %s""" % (event.summary, event.location, event.description, \
-        agenda, event.allday, event.start_local, event.end_local, \
-        freq, until)
+Until: %s""" % (event.summary, event.location, event.description,
+                agenda, event.allday, event.start_local, event.end_local,
+                freq, until)
+
 
 def process_user_input(input):
     return
@@ -97,7 +101,6 @@ def process_user_input(input):
     counter = 1
     for line in input.splitlines():
         counter += 1
-        #(.*):(.*)
         if line == "" or line.startswith("#"):
             continue
         try:
@@ -105,7 +108,7 @@ def process_user_input(input):
             key = obj[0].strip().lower()
             value = obj[1].strip()
             data[key] = value.decode("utf-8")
-        except IndexError as e:
+        except IndexError:
             print("Error in input line %d: Malformed input\nLine: %s" %
-                    (counter, line))
+                  (counter, line))
             sys.exit(1)
