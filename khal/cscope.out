@@ -1,0 +1,5681 @@
+cscope 15 /home/coachshea/ignore/khal/khal -c 0000039289
+	@./version.py
+
+4 
+	=version
+ = '0.6.1.dev88+ng37bffff.d20150829'
+
+
+	@./calendar_display.py
+
+22 from 
+	~__future__
+ import 
+print_function
+
+24 import 
+	~calendar
+
+25 import 
+	~datetime
+
+27 from 
+	~click
+ import 
+style
+
+29 from . 
+	~compat
+ import 
+VERSION
+
+32 def 
+	$month_abbr
+ ( 
+month_no
+ ) :
+
+35 if 
+VERSION
+ == 2 :
+
+37 return 
+calendar
+ . 
+month_abbr
+ [ 
+month_no
+ ] . 
+	`decode
+ ( 'utf-8' )
+
+38 elif 
+VERSION
+ == 3 :
+
+39 return 
+calendar
+ . 
+month_abbr
+ [ 
+month_no
+ ] 
+	}
+
+42 def 
+	$getweeknumber
+ ( 
+date
+ ) :
+
+49 return 
+datetime
+ . 
+date
+ . 
+	`isocalendar
+ ( 
+date
+ ) [ 1 ] 
+	}
+
+52 def 
+	$str_week
+ ( 
+week
+ , 
+today
+ ) :
+
+64 
+	=strweek
+ = ''
+
+65 for 
+day
+ in 
+week
+ :
+
+66 if 
+day
+ == 
+today
+ :
+
+67 
+	=day
+ = 
+	`style
+ ( 
+	`str
+ ( 
+day
+ . 
+day
+ ) . 
+	`rjust
+ ( 2 ) , 
+reverse
+ = True )
+
+69 
+	=day
+ = 
+	`str
+ ( 
+day
+ . 
+day
+ ) . 
+	`rjust
+ ( 2 )
+
+70 
+	=strweek
+ = 
+strweek
+ + 
+day
+ + ' '
+
+71 return 
+strweek
+ 
+	}
+
+74 def 
+	$vertical_month
+ ( 
+month
+ = 
+datetime
+ . 
+date
+ . 
+	`today
+ ( ) . 
+month
+ ,
+
+75 
+year
+ = 
+datetime
+ . 
+date
+ . 
+	`today
+ ( ) . 
+year
+ ,
+
+76 
+today
+ = 
+datetime
+ . 
+date
+ . 
+	`today
+ ( ) ,
+
+77 
+weeknumber
+ = False ,
+
+78 
+count
+ = 3 ,
+
+79 
+firstweekday
+ = 0 ) :
+
+101 
+	=khal
+ = 
+	`list
+ ( )
+
+102 
+	=w_number
+ = '    ' if 
+weeknumber
+ == 'right' else ''
+
+103 
+calendar
+ . 
+	`setfirstweekday
+ ( 
+firstweekday
+ )
+
+104 
+	=_calendar
+ = 
+calendar
+ . 
+	`Calendar
+ ( 
+firstweekday
+ )
+
+105 
+khal
+ . 
+	`append
+ (
+
+106 
+	`style
+ ( '    ' + 
+calendar
+ . 
+	`weekheader
+ ( 2 ) + ' ' + 
+w_number
+ , 
+bold
+ = True )
+
+108 for 
+_
+ in 
+	`range
+ ( 
+count
+ ) :
+
+109 for 
+week
+ in 
+_calendar
+ . 
+	`monthdatescalendar
+ ( 
+year
+ , 
+month
+ ) :
+
+110 
+	=new_month
+ = 
+	`len
+ ( [ 
+day
+ for 
+day
+ in 
+week
+ if 
+day
+ . 
+day
+ == 1 ] )
+
+111 
+	=strweek
+ = 
+	`str_week
+ ( 
+week
+ , 
+today
+ )
+
+112 if 
+new_month
+ :
+
+113 
+	=m_name
+ = 
+	`style
+ ( 
+	`month_abbr
+ ( 
+week
+ [ 6 ] . 
+month
+ ) . 
+	`ljust
+ ( 4 ) , 
+bold
+ = True )
+
+114 elif 
+weeknumber
+ == 'left' :
+
+115 
+	=m_name
+ =
+
+116 
+	`style
+ ( ' {:2} ' . 
+	`format
+ ( 
+	`getweeknumber
+ ( 
+week
+ [ 0 ] ) ) , 
+bold
+ = True )
+
+118 
+	=m_name
+ = '    '
+
+119 if 
+weeknumber
+ == 'right' :
+
+120 
+	=w_number
+ =
+
+121 
+	`style
+ ( ' {}' . 
+	`format
+ ( 
+	`getweeknumber
+ ( 
+week
+ [ 0 ] ) ) , 
+bold
+ = True )
+
+123 
+	=w_number
+ = ''
+
+125 
+	=sweek
+ = 
+m_name
+ + 
+strweek
+ + 
+w_number
+
+126 if 
+sweek
+ != 
+khal
+ [ - 1 ] :
+
+127 
+khal
+ . 
+	`append
+ ( 
+sweek
+ )
+
+128 
+	=month
+ = 
+month
+ + 1
+
+129 if 
+month
+ > 12 :
+
+130 
+	=month
+ = 1
+
+131 
+	=year
+ = 
+year
+ + 1
+
+132 return 
+khal
+ 
+	}
+
+
+	@./log.py
+
+23 import 
+	~logging
+
+24 import 
+	~sys
+
+26 import 
+	~click
+
+28 from 
+	~khal
+ import 
+__productname__
+
+31 class 
+	cColorFormatter
+ ( 
+logging
+ . 
+Formatter
+ ) :
+
+32 
+	=colors
+ = { 'error'
+
+33 : 
+	`dict
+ ( 
+fg
+ = 'red' ) , 'exception'
+
+34 : 
+	`dict
+ ( 
+fg
+ = 'red' ) , 'critical'
+
+35 : 
+	`dict
+ ( 
+fg
+ = 'red' ) , 'debug'
+
+36 : 
+	`dict
+ ( 
+fg
+ = 'blue' ) , 'warning'
+
+37 : 
+	`dict
+ ( 
+fg
+ = 'yellow' )
+
+40 def 
+	$format
+ ( 
+self
+ , 
+record
+ ) :
+
+41 if not 
+record
+ . 
+exc_info
+ :
+
+42 
+	=level
+ = 
+record
+ . 
+levelname
+ . 
+	`lower
+ ( )
+
+43 if 
+level
+ in 
+self
+ . 
+colors
+ :
+
+44 
+	=prefix
+ = 
+click
+ . 
+	`style
+ ( '{}: ' . 
+	`format
+ ( 
+level
+ ) ,
+
+45 ** 
+self
+ . 
+colors
+ [ 
+level
+ ] )
+
+46 
+record
+ . 
+	=msg
+ = '\n' . 
+	`join
+ ( 
+prefix
+ + 
+x
+
+47 for 
+x
+ in 
+	`str
+ ( 
+record
+ . 
+msg
+ ) . 
+	`splitlines
+ ( ) )
+
+49 return 
+logging
+ . 
+Formatter
+ . 
+	`format
+ ( 
+self
+ , 
+record
+ ) 
+	}
+
+52 class 
+	cClickStream
+ ( 
+object
+ ) :
+
+54 def 
+	$write
+ ( 
+self
+ , 
+string
+ ) :
+
+55 
+click
+ . 
+	`echo
+ ( 
+string
+ , 
+file
+ = 
+sys
+ . 
+stderr
+ , 
+nl
+ = False ) 
+	}
+
+58 
+	=stdout_handler
+ = 
+logging
+ . 
+	`StreamHandler
+ ( 
+	`ClickStream
+ ( ) )
+
+59 
+stdout_handler
+ . 
+	=formatter
+ = 
+	`ColorFormatter
+ ( )
+
+61 
+	=logger
+ = 
+logging
+ . 
+	`getLogger
+ ( 
+__productname__
+ )
+
+62 
+logger
+ . 
+	`setLevel
+ ( 
+logging
+ . 
+INFO
+ )
+
+63 
+logger
+ . 
+	`addHandler
+ ( 
+stdout_handler
+ )
+
+
+	@./exceptions.py
+
+24 class 
+	cError
+ ( 
+Exception
+ ) :
+
+30 class 
+	cFatalError
+ ( 
+Error
+ ) :
+
+36 class 
+	cUnsupportedFeatureError
+ ( 
+Error
+ ) :
+
+42 class 
+	cInvalidDate
+ ( 
+Error
+ ) :
+
+
+	@./aux.py
+
+26 from . 
+	~compat
+ import 
+to_unicode
+
+28 from 
+	~datetime
+ import 
+date
+ , 
+datetime
+ , 
+timedelta
+
+29 from 
+	~datetime
+ import 
+time
+ as 
+dtime
+
+30 import 
+	~random
+
+31 import 
+	~string
+
+33 import 
+	~icalendar
+
+34 import 
+	~pytz
+
+36 from 
+	~khal.log
+ import 
+logger
+
+37 from 
+	~khal.exceptions
+ import 
+FatalError
+
+40 def 
+	$timefstr
+ ( 
+dtime_list
+ , 
+timeformat
+ ) :
+
+50 if 
+	`len
+ ( 
+dtime_list
+ ) == 0 :
+
+51 raise 
+	`ValueError
+ ( )
+
+52 
+	=time_start
+ = 
+datetime
+ . 
+	`strptime
+ ( 
+dtime_list
+ [ 0 ] , 
+timeformat
+ )
+
+53 
+	=time_start
+ = 
+	`dtime
+ ( * 
+time_start
+ . 
+	`timetuple
+ ( ) [ 3 : 5 ] )
+
+54 
+	=day_start
+ = 
+date
+ . 
+	`today
+ ( )
+
+55 
+	=dtstart
+ = 
+datetime
+ . 
+	`combine
+ ( 
+day_start
+ , 
+time_start
+ )
+
+56 
+dtime_list
+ . 
+	`pop
+ ( 0 )
+
+57 return 
+dtstart
+ 
+	}
+
+60 def 
+	$datetimefstr
+ ( 
+dtime_list
+ , 
+dtformat
+ ) :
+
+70 
+	=parts
+ = 
+dtformat
+ . 
+	`count
+ ( ' ' ) + 1
+
+71 
+	=dtstring
+ = ' ' . 
+	`join
+ ( 
+dtime_list
+ [ 0 : 
+parts
+ ] )
+
+72 
+	=dtstart
+ = 
+datetime
+ . 
+	`strptime
+ ( 
+dtstring
+ , 
+dtformat
+ )
+
+73 for 
+_
+ in 
+	`range
+ ( 
+parts
+ ) :
+
+74 
+dtime_list
+ . 
+	`pop
+ ( 0 )
+
+75 return 
+dtstart
+ 
+	}
+
+78 def 
+	$weekdaypstr
+ ( 
+dayname
+ ) :
+
+87 if 
+dayname
+ in [ 'monday' , 'mon' ] :
+
+89 if 
+dayname
+ in [ 'tuesday' , 'tue' ] :
+
+91 if 
+dayname
+ in [ 'wednesday' , 'wed' ] :
+
+93 if 
+dayname
+ in [ 'thursday' , 'thu' ] :
+
+95 if 
+dayname
+ in [ 'friday' , 'fri' ] :
+
+97 if 
+dayname
+ in [ 'saturday' , 'sat' ] :
+
+99 if 
+dayname
+ in [ 'sunday' , 'sun' ] :
+
+101 raise 
+	`ValueError
+ ( 'invalid weekday name `%s`' % 
+dayname
+ ) 
+	}
+
+104 def 
+	$calc_day
+ ( 
+dayname
+ ) :
+
+112 
+	=today
+ = 
+datetime
+ . 
+	`today
+ ( )
+
+113 
+	=dayname
+ = 
+dayname
+ . 
+	`lower
+ ( )
+
+114 if 
+dayname
+ == 'today' :
+
+115 return 
+today
+
+116 if 
+dayname
+ == 'tomorrow' :
+
+117 return 
+today
+ + 
+	`timedelta
+ ( 
+days
+ = 1 )
+
+119 
+	=wday
+ = 
+	`weekdaypstr
+ ( 
+dayname
+ )
+
+120 
+	=days
+ = ( 
+wday
+ - 
+today
+ . 
+	`weekday
+ ( ) ) % 7
+
+121 
+	=days
+ = 7 if 
+days
+ == 0 else 
+days
+
+122 
+	=day
+ = 
+today
+ + 
+	`timedelta
+ ( 
+days
+ = 
+days
+ )
+
+123 return 
+day
+ 
+	}
+
+126 def 
+	$datefstr_weekday
+ ( 
+dtime_list
+ , 
+_
+ ) :
+
+136 if 
+	`len
+ ( 
+dtime_list
+ ) == 0 :
+
+137 raise 
+	`ValueError
+ ( )
+
+138 
+	=day
+ = 
+	`calc_day
+ ( 
+dtime_list
+ [ 0 ] )
+
+139 
+dtime_list
+ . 
+	`pop
+ ( 0 )
+
+140 return 
+day
+ 
+	}
+
+143 def 
+	$datetimefstr_weekday
+ ( 
+dtime_list
+ , 
+timeformat
+ ) :
+
+144 if 
+	`len
+ ( 
+dtime_list
+ ) == 0 :
+
+145 raise 
+	`ValueError
+ ( )
+
+146 
+	=day
+ = 
+	`calc_day
+ ( 
+dtime_list
+ [ 0 ] )
+
+147 
+	=time
+ = 
+	`timefstr
+ ( 
+dtime_list
+ [ 1 : ] , 
+timeformat
+ )
+
+148 
+dtime_list
+ . 
+	`pop
+ ( 0 )
+
+149 
+dtime_list
+ . 
+	`pop
+ ( 0 )
+
+150 
+	=dtime
+ = 
+datetime
+ . 
+	`combine
+ ( 
+day
+ , 
+time
+ . 
+	`time
+ ( ) )
+
+151 return 
+dtime
+ 
+	}
+
+154 def 
+	$guessdatetimefstr
+ ( 
+dtime_list
+ , 
+locale
+ , 
+default_day
+ = 
+datetime
+ . 
+	`today
+ ( ) ) :
+
+162 def 
+timefstr_day
+ ( 
+dtime_list
+ , 
+timeformat
+ ) :
+
+163 
+	=a_date
+ = 
+	`timefstr
+ ( 
+dtime_list
+ , 
+timeformat
+ )
+
+164 
+	=a_date
+ = 
+	`datetime
+ ( * ( 
+default_day
+ . 
+	`timetuple
+ ( ) [ : 3 ] + 
+a_date
+ . 
+	`timetuple
+ ( ) [ 3 : 5 ] ) )
+
+165 return 
+a_date
+
+167 def 
+datefstr_year
+ ( 
+dtime_list
+ , 
+dateformat
+ ) :
+
+168 
+	=a_date
+ = 
+	`datetimefstr
+ ( 
+dtime_list
+ , 
+dateformat
+ )
+
+169 
+	=a_date
+ = 
+	`datetime
+ ( * ( 
+default_day
+ . 
+	`timetuple
+ ( ) [ : 1 ] + 
+a_date
+ . 
+	`timetuple
+ ( ) [ 1 : 5 ] ) )
+
+170 return 
+a_date
+
+172 
+	=dtstart
+ = None
+
+173 for 
+fun
+ , 
+dtformat
+ , 
+all_day
+ in [
+
+174 ( 
+datefstr_year
+ , 
+locale
+ [ 'datetimeformat' ] , False ) ,
+
+175 ( 
+datetimefstr
+ , 
+locale
+ [ 'longdatetimeformat' ] , False ) ,
+
+176 ( 
+timefstr_day
+ , 
+locale
+ [ 'timeformat' ] , False ) ,
+
+177 ( 
+datetimefstr_weekday
+ , 
+locale
+ [ 'timeformat' ] , False ) ,
+
+178 ( 
+datefstr_year
+ , 
+locale
+ [ 'dateformat' ] , True ) ,
+
+179 ( 
+datetimefstr
+ , 
+locale
+ [ 'longdateformat' ] , True ) ,
+
+180 ( 
+datefstr_weekday
+ , None , True ) ,
+
+184 
+	=dtstart
+ = 
+	`fun
+ ( 
+dtime_list
+ , 
+dtformat
+ )
+
+185 return 
+dtstart
+ , 
+all_day
+
+186 except 
+ValueError
+ :
+
+188 raise 
+	`ValueError
+ ( ) 
+	}
+
+191 def 
+	$generate_random_uid
+ ( ) :
+
+196 
+	=choice
+ = 
+string
+ . 
+ascii_uppercase
+ + 
+string
+ . 
+digits
+
+197 return '' . 
+	`join
+ ( [ 
+random
+ . 
+	`choice
+ ( 
+choice
+ ) for 
+_
+ in 
+	`range
+ ( 36 ) ] ) 
+	}
+
+200 def 
+	$construct_event
+ ( 
+dtime_list
+ , 
+locale
+ ,
+
+201 
+defaulttimelen
+ = 60 , 
+defaultdatelen
+ = 1 , 
+encoding
+ = 'utf-8' ,
+
+202 
+description
+ = None , 
+location
+ = None , 
+repeat
+ = None , 
+until
+ = None ,
+
+203 
+_now
+ = 
+datetime
+ . 
+now
+ , ** 
+kwargs
+ ) :
+
+241 
+	=today
+ = 
+datetime
+ . 
+	`today
+ ( )
+
+243 
+	=dtstart
+ , 
+	=all_day
+ = 
+	`guessdatetimefstr
+ ( 
+dtime_list
+ , 
+locale
+ )
+
+244 except 
+ValueError
+ :
+
+245 
+logger
+ . 
+	`fatal
+ ( "Cannot parse: '{}'\nPlease have a look at " "the documentation."
+
+246 . 
+	`format
+ ( ' ' . 
+	`join
+ ( 
+dtime_list
+ ) ) )
+
+247 raise 
+	`FatalError
+ ( )
+
+250 
+	=dtend
+ , 
+	=_
+ = 
+	`guessdatetimefstr
+ ( 
+dtime_list
+ , 
+locale
+ , 
+dtstart
+ )
+
+251 except 
+ValueError
+ :
+
+252 if 
+all_day
+ :
+
+253 
+	=dtend
+ = 
+dtstart
+ + 
+	`timedelta
+ ( 
+days
+ = 
+defaultdatelen
+ - 1 )
+
+255 
+	=dtend
+ = 
+dtstart
+ + 
+	`timedelta
+ ( 
+minutes
+ = 
+defaulttimelen
+ )
+
+257 if 
+all_day
+ :
+
+258 
+	=dtend
+ += 
+	`timedelta
+ ( 
+days
+ = 1 )
+
+260 if 
+dtend
+ . 
+year
+ == 
+today
+ . 
+year
+ and 
+dtstart
+ . 
+year
+ != 
+today
+ . 
+year
+ :
+
+261 
+	=dtend
+ = 
+	`datetime
+ ( 
+dtstart
+ . 
+year
+ , * 
+dtend
+ . 
+	`timetuple
+ ( ) [ 1 : 6 ] )
+
+263 if 
+dtend
+ < 
+dtstart
+ :
+
+264 
+	=dtend
+ = 
+	`datetime
+ ( 
+dtend
+ . 
+year
+ + 1 , * 
+dtend
+ . 
+	`timetuple
+ ( ) [ 1 : 6 ] )
+
+266 if 
+dtend
+ < 
+dtstart
+ :
+
+267 
+	=dtend
+ = 
+	`datetime
+ ( * 
+dtstart
+ . 
+	`timetuple
+ ( ) [ 0 : 3 ] +
+
+268 
+dtend
+ . 
+	`timetuple
+ ( ) [ 3 : 5 ] )
+
+269 if 
+dtend
+ < 
+dtstart
+ :
+
+270 
+	=dtend
+ = 
+dtend
+ + 
+	`timedelta
+ ( 
+days
+ = 1 )
+
+271 if 
+all_day
+ :
+
+272 
+	=dtstart
+ = 
+dtstart
+ . 
+	`date
+ ( )
+
+273 
+	=dtend
+ = 
+dtend
+ . 
+	`date
+ ( )
+
+278 
+	=dtstart
+ = 
+pytz
+ . 
+	`timezone
+ ( 
+dtime_list
+ [ 0 ] ) . 
+	`localize
+ ( 
+dtstart
+ )
+
+279 
+	=dtend
+ = 
+pytz
+ . 
+	`timezone
+ ( 
+dtime_list
+ [ 0 ] ) . 
+	`localize
+ ( 
+dtend
+ )
+
+280 
+dtime_list
+ . 
+	`pop
+ ( 0 )
+
+281 except ( 
+pytz
+ . 
+UnknownTimeZoneError
+ , 
+UnicodeDecodeError
+ ) :
+
+282 
+	=dtstart
+ = 
+locale
+ [ 'default_timezone' ] . 
+	`localize
+ ( 
+dtstart
+ )
+
+283 
+	=dtend
+ = 
+locale
+ [ 'default_timezone' ] . 
+	`localize
+ ( 
+dtend
+ )
+
+285 
+	=event
+ = 
+icalendar
+ . 
+	`Event
+ ( )
+
+286 
+	=text
+ = 
+	`to_unicode
+ ( ' ' . 
+	`join
+ ( 
+dtime_list
+ ) , 
+encoding
+ )
+
+287 if not 
+description
+ or not 
+location
+ :
+
+288 
+	=summary
+ = 
+text
+ . 
+	`split
+ ( ' :: ' , 1 ) [ 0 ]
+
+290 
+	=description
+ = 
+text
+ . 
+	`split
+ ( ' :: ' , 1 ) [ 1 ]
+
+291 except 
+IndexError
+ :
+
+294 
+	=summary
+ = 
+text
+
+296 if 
+description
+ :
+
+297 
+event
+ . 
+	`add
+ ( 'description' , 
+description
+ )
+
+298 if 
+location
+ :
+
+299 
+event
+ . 
+	`add
+ ( 'location' , 
+location
+ )
+
+300 if 
+repeat
+ and 
+repeat
+ != "none" :
+
+301 if 
+repeat
+ in [ "daily" , "weekly" , "monthly" , "yearly" ] :
+
+302 
+	=rrule_settings
+ = { 'freq' : 
+repeat
+ }
+
+303 if 
+until
+ :
+
+304 
+	=until_date
+ = None
+
+305 for 
+fun
+ , 
+dformat
+ in [ ( 
+datetimefstr
+ , 
+locale
+ [ 'datetimeformat' ] ) ,
+
+306 ( 
+datetimefstr
+ , 
+locale
+ [ 'longdatetimeformat' ] ) ,
+
+307 ( 
+timefstr
+ , 
+locale
+ [ 'timeformat' ] ) ,
+
+308 ( 
+datetimefstr
+ , 
+locale
+ [ 'dateformat' ] ) ,
+
+309 ( 
+datetimefstr
+ , 
+locale
+ [ 'longdateformat' ] ) ] :
+
+311 
+	=until_date
+ = 
+	`fun
+ ( 
+until
+ , 
+dformat
+ )
+
+313 except 
+ValueError
+ :
+
+315 if 
+until_date
+ is None :
+
+316 
+logger
+ . 
+	`fatal
+ ( "Cannot parse until date: '{}'\nPlease have a look " "at the documentation."
+
+317 . 
+	`format
+ ( 
+until
+ ) )
+
+318 raise 
+	`FatalError
+ ( )
+
+319 
+	=rrule_settings
+ [ 'until' ] = 
+until_date
+
+321 
+event
+ . 
+	`add
+ ( 'rrule' , 
+rrule_settings
+ )
+
+323 
+logger
+ . 
+	`fatal
+ ( "Invalid value for the repeat option. \\n                    Possible values are: daily, weekly, monthly or yearly"
+
+325 raise 
+	`FatalError
+ ( )
+
+327 
+event
+ . 
+	`add
+ ( 'dtstart' , 
+dtstart
+ )
+
+328 
+event
+ . 
+	`add
+ ( 'dtend' , 
+dtend
+ )
+
+329 
+event
+ . 
+	`add
+ ( 'dtstamp' , 
+	`_now
+ ( ) )
+
+330 
+event
+ . 
+	`add
+ ( 'summary' , 
+summary
+ )
+
+331 
+event
+ . 
+	`add
+ ( 'uid' , 
+	`generate_random_uid
+ ( ) )
+
+332 return 
+event
+ 
+	}
+
+335 def 
+	$new_event
+ ( 
+dtstart
+ = None , 
+dtend
+ = None , 
+summary
+ = None , 
+timezone
+ = None ,
+
+336 
+_now
+ = 
+datetime
+ . 
+now
+ ) :
+
+351 
+	=now
+ = 
+datetime
+ . 
+	`now
+ ( ) . 
+	`timetuple
+ ( )
+
+352 
+	=now
+ = 
+	`datetime
+ ( 
+now
+ . 
+tm_year
+ , 
+now
+ . 
+tm_mon
+ , 
+now
+ . 
+tm_mday
+ , 
+now
+ . 
+tm_hour
+ )
+
+353 
+	=inonehour
+ = 
+now
+ + 
+	`timedelta
+ ( 
+minutes
+ = 60 )
+
+354 if 
+dtstart
+ is None :
+
+355 
+	=dtstart
+ = 
+inonehour
+
+356 elif 
+	`isinstance
+ ( 
+dtstart
+ , 
+date
+ ) :
+
+357 
+	=time_start
+ = 
+inonehour
+ . 
+	`time
+ ( )
+
+358 
+	=dtstart
+ = 
+datetime
+ . 
+	`combine
+ ( 
+dtstart
+ , 
+time_start
+ )
+
+360 if 
+dtend
+ is None :
+
+361 
+	=dtend
+ = 
+dtstart
+ + 
+	`timedelta
+ ( 
+minutes
+ = 60 )
+
+362 if 
+summary
+ is None :
+
+363 
+	=summary
+ = ''
+
+364 if 
+timezone
+ is not None :
+
+365 
+	=dtstart
+ = 
+timezone
+ . 
+	`localize
+ ( 
+dtstart
+ )
+
+366 
+	=dtend
+ = 
+timezone
+ . 
+	`localize
+ ( 
+dtend
+ )
+
+367 
+	=event
+ = 
+icalendar
+ . 
+	`Event
+ ( )
+
+368 
+event
+ . 
+	`add
+ ( 'dtstart' , 
+dtstart
+ )
+
+369 
+event
+ . 
+	`add
+ ( 'dtend' , 
+dtend
+ )
+
+370 
+event
+ . 
+	`add
+ ( 'dtstamp' , 
+	`_now
+ ( ) )
+
+371 
+event
+ . 
+	`add
+ ( 'summary' , 
+summary
+ )
+
+372 
+event
+ . 
+	`add
+ ( 'uid' , 
+	`generate_random_uid
+ ( ) )
+
+373 
+event
+ . 
+	`add
+ ( 'sequence' , 0 )
+
+374 return 
+event
+ 
+	}
+
+377 def 
+	$ics_from_list
+ ( 
+vevent
+ , 
+random_uid
+ = False ) :
+
+383 
+	=calendar
+ = 
+icalendar
+ . 
+	`Calendar
+ ( )
+
+384 
+calendar
+ . 
+	`add
+ ( 'version' , '2.0' )
+
+385 
+calendar
+ . 
+	`add
+ ( 'prodid' , '-//CALENDARSERVER.ORG//NONSGML Version 1//EN' )
+
+386 if 
+random_uid
+ :
+
+387 
+	=new_uid
+ = 
+icalendar
+ . 
+	`vText
+ ( 
+	`generate_random_uid
+ ( ) )
+
+388 for 
+sub_event
+ in 
+vevent
+ :
+
+389 if 
+random_uid
+ :
+
+390 
+	=sub_event
+ [ 'uid' ] = 
+new_uid
+
+391 
+calendar
+ . 
+	`add_component
+ ( 
+sub_event
+ )
+
+392 return 
+calendar
+ 
+	}
+
+
+	@./terminal.py
+
+26 from 
+	~itertools
+ import 
+izip_longest
+ as 
+zip_longest
+
+27 except 
+ImportError
+ :
+
+28 from 
+	~itertools
+ import 
+zip_longest
+
+32 import 
+	~shutil.get_terminal_size
+ as 
+get_terminal_size
+
+33 except 
+ImportError
+ :
+
+34 def 
+	$get_terminal_size
+ ( ) :
+
+35 import 
+	~fcntl
+
+36 import 
+	~struct
+
+37 import 
+	~termios
+
+39 
+	=h
+ , 
+	=w
+ , 
+	=hp
+ , 
+	=wp
+ = 
+struct
+ . 
+	`unpack
+ ( 'HHHH'
+
+41 
+fcntl
+ . 
+	`ioctl
+ ( 0 , 
+termios
+ . 
+TIOCGWINSZ
+ ,
+
+42 
+struct
+ . 
+	`pack
+ ( 'HHHH' , 0 , 0 , 0 , 0 ) ) )
+
+43 except 
+IOError
+ :
+
+44 
+	=w
+ , 
+	=h
+ = 80 , 24
+
+45 return 
+w
+ , 
+h
+ 
+	}
+
+47 
+	=RTEXT
+ = '\x1b[7m'
+
+48 
+	=NTEXT
+ = '\x1b[0m'
+
+49 
+	=BTEXT
+ = '\x1b[1m'
+
+50 
+	=RESET
+ = '\33[0m'
+
+51 
+	=COLORS
+ = { 'black'
+
+71 def 
+	$colored
+ ( 
+string
+ , 
+colorstring
+ ) :
+
+73 
+	=color
+ = 
+COLORS
+ [ 
+colorstring
+ ]
+
+74 except 
+KeyError
+ :
+
+75 
+	=color
+ = ''
+
+76 return 
+color
+ + 
+string
+ + ( 
+RESET
+ if 
+color
+ else '' ) 
+	}
+
+79 def 
+	$merge_columns
+ ( 
+lcolumn
+ , 
+rcolumn
+ , 
+width
+ = 25 ) :
+
+89 
+	=missing
+ = 
+	`len
+ ( 
+rcolumn
+ ) - 
+	`len
+ ( 
+lcolumn
+ )
+
+90 if 
+missing
+ > 0 :
+
+91 
+	=lcolumn
+ = 
+lcolumn
+ + 
+missing
+ * [ 
+width
+ * ' ' ]
+
+93 
+	=rows
+ = [ '    ' . 
+	`join
+ ( 
+one
+ ) for 
+one
+ in 
+	`zip_longest
+ (
+
+94 
+lcolumn
+ , 
+rcolumn
+ , 
+fillvalue
+ = '' ) ]
+
+95 return 
+rows
+ 
+	}
+
+
+	@./controllers.py
+
+24 from 
+	~__future__
+ import 
+unicode_literals
+
+26 import 
+	~icalendar
+
+27 from 
+	~click
+ import 
+confirm
+ , 
+echo
+ , 
+style
+ , 
+prompt
+
+28 from 
+	~vdirsyncer.utils.vobject
+ import 
+Item
+
+30 from 
+	~collections
+ import 
+defaultdict
+
+32 import 
+	~datetime
+
+33 import 
+	~itertools
+
+34 import 
+	~logging
+
+35 import 
+	~sys
+
+36 import 
+	~textwrap
+
+38 from 
+	~khal
+ import 
+aux
+ , 
+calendar_display
+
+39 from 
+	~khal.compat
+ import 
+to_unicode
+
+40 from 
+	~khal.khalendar.exceptions
+ import 
+ReadOnlyCalendarError
+ , 
+DuplicateUid
+
+41 from 
+	~khal.exceptions
+ import 
+InvalidDate
+ , 
+FatalError
+
+42 from 
+	~khal.khalendar.event
+ import 
+Event
+
+43 from 
+	~khal.khalendar.backend
+ import 
+sort_key
+
+44 from 
+	~khal
+ import 
+__version__
+ , 
+__productname__
+
+45 from 
+	~khal.log
+ import 
+logger
+
+46 from . 
+	~terminal
+ import 
+colored
+ , 
+get_terminal_size
+ , 
+merge_columns
+
+49 def 
+	$construct_daynames
+ ( 
+daylist
+ , 
+longdateformat
+ ) :
+
+59 for 
+date
+ in 
+daylist
+ :
+
+60 if 
+date
+ == 
+datetime
+ . 
+date
+ . 
+	`today
+ ( ) :
+
+61 yield ( 
+date
+ , 'Today:' )
+
+62 elif 
+date
+ == 
+datetime
+ . 
+date
+ . 
+	`today
+ ( ) + 
+datetime
+ . 
+	`timedelta
+ ( 
+days
+ = 1 ) :
+
+63 yield ( 
+date
+ , 'Tomorrow:' )
+
+65 yield ( 
+date
+ , 
+date
+ . 
+	`strftime
+ ( 
+longdateformat
+ ) ) 
+	}
+
+68 def 
+	$get_agenda
+ ( 
+collection
+ , 
+locale
+ , 
+dates
+ = None , 
+firstweekday
+ = 0 ,
+
+69 
+days
+ = None , 
+events
+ = None , 
+width
+ = 45 , 
+show_all_days
+ = False ) :
+
+84 
+	=event_column
+ = 
+	`list
+ ( )
+
+86 if 
+days
+ is None :
+
+87 
+	=days
+ = 2
+
+89 if 
+dates
+ is None or 
+	`len
+ ( 
+dates
+ ) == 0 :
+
+90 
+	=dates
+ = [ 
+datetime
+ . 
+date
+ . 
+	`today
+ ( ) ]
+
+93 
+	=dates
+ = [
+
+94 
+aux
+ . 
+	`guessdatetimefstr
+ ( [ 
+date
+ ] , 
+locale
+ ) [ 0 ] . 
+	`date
+ ( )
+
+95 if not 
+	`isinstance
+ ( 
+date
+ , 
+datetime
+ . 
+date
+ ) else 
+date
+
+96 for 
+date
+ in 
+dates
+
+98 except 
+InvalidDate
+ as 
+error
+ :
+
+99 
+logging
+ . 
+	`fatal
+ ( 
+error
+ )
+
+100 
+sys
+ . 
+	`exit
+ ( 1 )
+
+102 if 
+days
+ is not None :
+
+103 
+	=daylist
+ = [ 
+date
+ + 
+datetime
+ . 
+	`timedelta
+ ( 
+days
+ = 
+one
+ )
+
+104 for 
+one
+ in 
+	`range
+ ( 
+days
+ ) for 
+date
+ in 
+dates
+ ]
+
+105 
+daylist
+ . 
+	`sort
+ ( )
+
+107 
+	=daylist
+ = 
+	`construct_daynames
+ ( 
+daylist
+ , 
+locale
+ [ 'longdateformat' ] )
+
+108 
+	=localize
+ = 
+locale
+ [ 'local_timezone' ] . 
+localize
+
+110 for 
+day
+ , 
+dayname
+ in 
+daylist
+ :
+
+111 
+	=start
+ = 
+	`localize
+ ( 
+datetime
+ . 
+datetime
+ . 
+	`combine
+ ( 
+day
+ , 
+datetime
+ . 
+time
+ . 
+min
+ ) )
+
+112 
+	=end
+ = 
+	`localize
+ ( 
+datetime
+ . 
+datetime
+ . 
+	`combine
+ ( 
+day
+ , 
+datetime
+ . 
+time
+ . 
+max
+ ) )
+
+115 
+	=all_day_events
+ = 
+collection
+ . 
+	`get_allday_by_time_range
+ ( 
+day
+ )
+
+116 
+	=events
+ = 
+collection
+ . 
+	`get_datetime_by_time_range
+ ( 
+start
+ , 
+end
+ )
+
+117 if 
+	`len
+ ( 
+events
+ ) == 0 and 
+	`len
+ ( 
+all_day_events
+ ) == 0 and not 
+show_all_days
+ :
+
+120 
+event_column
+ . 
+	`append
+ ( 
+	`style
+ ( 
+dayname
+ , 
+bold
+ = True ) )
+
+121 
+events
+ . 
+	`sort
+ ( 
+key
+ = lambda 
+e
+ : 
+e
+ . 
+start
+ )
+
+122 for 
+event
+ in 
+itertools
+ . 
+	`chain
+ ( 
+all_day_events
+ , 
+events
+ ) :
+
+123 
+	=desc
+ = 
+textwrap
+ . 
+	`wrap
+ ( 
+event
+ . 
+	`relative_to
+ ( 
+day
+ ) , 
+width
+ )
+
+124 
+event_column
+ . 
+	`extend
+ ( [ 
+	`colored
+ ( 
+d
+ , 
+event
+ . 
+color
+ ) for 
+d
+ in 
+desc
+ ] )
+
+126 if 
+event_column
+ == [ ] :
+
+127 
+	=event_column
+ = [ 
+	`style
+ ( 'No events' , 
+bold
+ = True ) ]
+
+128 return 
+event_column
+ 
+	}
+
+131 def 
+	$calendar
+ ( 
+collection
+ , 
+date
+ = None , 
+firstweekday
+ = 0 , 
+encoding
+ = 'utf-8' ,
+
+132 
+weeknumber
+ = False , 
+show_all_days
+ = False , ** 
+kwargs
+ ) :
+
+133 if 
+date
+ is None :
+
+134 
+	=date
+ = [ 
+datetime
+ . 
+datetime
+ . 
+	`today
+ ( ) ]
+
+136 
+	=term_width
+ , 
+	=_
+ = 
+	`get_terminal_size
+ ( )
+
+137 
+	=lwidth
+ = 25
+
+138 
+	=rwidth
+ = 
+term_width
+ - 
+lwidth
+ - 4
+
+139 
+	=event_column
+ = 
+	`get_agenda
+ (
+
+140 
+collection
+ , 
+dates
+ = 
+date
+ , 
+width
+ = 
+rwidth
+ , 
+show_all_days
+ = 
+show_all_days
+ ,
+
+141 ** 
+kwargs
+ )
+
+142 
+	=calendar_column
+ = 
+calendar_display
+ . 
+	`vertical_month
+ (
+
+143 
+firstweekday
+ = 
+firstweekday
+ , 
+weeknumber
+ = 
+weeknumber
+ )
+
+145 
+	=rows
+ = 
+	`merge_columns
+ ( 
+calendar_column
+ , 
+event_column
+ )
+
+148 
+	`echo
+ ( '\n' . 
+	`join
+ ( 
+rows
+ ) . 
+	`encode
+ ( 
+encoding
+ ) ) 
+	}
+
+151 def 
+	$agenda
+ ( 
+collection
+ , 
+date
+ = None , 
+encoding
+ = 'utf-8' ,
+
+152 
+show_all_days
+ = False , ** 
+kwargs
+ ) :
+
+153 
+	=term_width
+ , 
+	=_
+ = 
+	`get_terminal_size
+ ( )
+
+154 
+	=event_column
+ = 
+	`get_agenda
+ ( 
+collection
+ , 
+dates
+ = 
+date
+ , 
+width
+ = 
+term_width
+ ,
+
+155 
+show_all_days
+ = 
+show_all_days
+ , ** 
+kwargs
+ )
+
+158 
+	`echo
+ ( 
+	`to_unicode
+ ( '\n' . 
+	`join
+ ( 
+event_column
+ ) , 
+encoding
+ ) ) 
+	}
+
+161 def 
+	$new_from_string
+ ( 
+collection
+ , 
+calendar_name
+ , 
+conf
+ , 
+date_list
+ , 
+location
+ = None , 
+repeat
+ = None ,
+
+162 
+until
+ = None ) :
+
+165 
+	=event
+ = 
+aux
+ . 
+	`construct_event
+ (
+
+166 
+date_list
+ ,
+
+167 
+location
+ = 
+location
+ ,
+
+168 
+repeat
+ = 
+repeat
+ ,
+
+169 
+until
+ = 
+until
+ ,
+
+170 
+locale
+ = 
+conf
+ [ 'locale' ] )
+
+171 except 
+FatalError
+ :
+
+172 
+sys
+ . 
+	`exit
+ ( 1 )
+
+173 
+	=event
+ = 
+Event
+ . 
+	`fromVEvents
+ (
+
+174 [ 
+event
+ ] , 
+calendar
+ = 
+calendar_name
+ , 
+locale
+ = 
+conf
+ [ 'locale' ] )
+
+177 
+collection
+ . 
+	`new
+ ( 
+event
+ )
+
+178 except 
+ReadOnlyCalendarError
+ :
+
+179 
+logger
+ . 
+	`fatal
+ ( 'ERROR: Cannot modify calendar "{}" as it is ' 'read-only'
+
+180 . 
+	`format
+ ( 
+calendar_name
+ ) )
+
+181 
+sys
+ . 
+	`exit
+ ( 1 )
+
+182 if 
+conf
+ [ 'default' ] [ 'print_new' ] == 'event' :
+
+183 
+	`echo
+ ( 
+event
+ . 
+event_description
+ )
+
+184 elif 
+conf
+ [ 'default' ] [ 'print_new' ] == 'path' :
+
+185 
+	=path
+ = 
+collection
+ . 
+_calnames
+ [ 
+event
+ . 
+calendar
+ ] . 
+path
+ + 
+event
+ . 
+href
+
+186 
+	`echo
+ ( 
+path
+ . 
+	`encode
+ ( 
+conf
+ [ 'locale' ] [ 'encoding' ] ) ) 
+	}
+
+189 def 
+	$interactive
+ ( 
+collection
+ , 
+conf
+ ) :
+
+191 from . import 
+ui
+
+192 
+	=pane
+ = 
+ui
+ . 
+	`ClassicView
+ ( 
+collection
+ ,
+
+193 
+conf
+ ,
+
+194 
+title
+ = 'select an event' ,
+
+195 
+description
+ = 'do something' )
+
+196 
+ui
+ . 
+	`start_pane
+ (
+
+197 
+pane
+ , 
+pane
+ . 
+cleanup
+ ,
+
+198 
+program_info
+ = '{0} v{1}' . 
+	`format
+ ( 
+__productname__
+ , 
+__version__
+ )
+
+199 ) 
+	}
+
+202 def 
+	$import_ics
+ ( 
+collection
+ , 
+conf
+ , 
+ics
+ , 
+batch
+ = False , 
+random_uid
+ = False ) :
+
+208 
+	=cal
+ = 
+icalendar
+ . 
+Calendar
+ . 
+	`from_ical
+ ( 
+ics
+ )
+
+209 
+	=events
+ = [ 
+item
+ for 
+item
+ in 
+cal
+ . 
+	`walk
+ ( ) if 
+item
+ . 
+name
+ == 'VEVENT' ]
+
+210 
+	=events_grouped
+ = 
+	`defaultdict
+ ( 
+list
+ )
+
+211 for 
+event
+ in 
+events
+ :
+
+212 
+events_grouped
+ [ 
+event
+ [ 'UID' ] ] . 
+	`append
+ ( 
+event
+ )
+
+214 
+	=vevents
+ = 
+	`list
+ ( )
+
+215 for 
+uid
+ in 
+events_grouped
+ :
+
+216 
+vevents
+ . 
+	`append
+ ( 
+	`sorted
+ ( 
+events_grouped
+ [ 
+uid
+ ] , 
+key
+ = 
+sort_key
+ ) )
+
+217 for 
+vevent
+ in 
+vevents
+ :
+
+218 
+	`import_event
+ ( 
+vevent
+ , 
+collection
+ , 
+conf
+ [ 'locale' ] , 
+batch
+ , 
+random_uid
+ ) 
+	}
+
+221 def 
+	$import_event
+ ( 
+vevent
+ , 
+collection
+ , 
+locale
+ , 
+batch
+ , 
+random_uid
+ ) :
+
+225 for 
+sub_event
+ in 
+vevent
+ :
+
+226 if not 
+batch
+ :
+
+227 
+	=event
+ = 
+Event
+ . 
+	`fromVEvents
+ (
+
+228 [ 
+sub_event
+ ] , 
+calendar
+ = 
+collection
+ . 
+default_calendar_name
+ , 
+locale
+ = 
+locale
+ )
+
+229 
+	`echo
+ ( 
+event
+ . 
+event_description
+ )
+
+232 if 
+batch
+ or 
+	`len
+ ( 
+collection
+ . 
+writable_names
+ ) == 1 :
+
+233 
+	=calendar_name
+ = 
+collection
+ . 
+default_calendar_name
+
+235 
+	=choice
+ = 
+	`list
+ ( )
+
+236 for 
+num
+ , 
+name
+ in 
+	`enumerate
+ ( 
+collection
+ . 
+writable_names
+ ) :
+
+237 
+choice
+ . 
+	`append
+ ( '{}({})' . 
+	`format
+ ( 
+name
+ , 
+num
+ ) )
+
+238 
+	=choice
+ = ', ' . 
+	`join
+ ( 
+choice
+ )
+
+240 
+	=value
+ = 
+	`prompt
+ ( 'Which calendar do you want to import to? \n' '{}'
+
+241 . 
+	`format
+ ( 
+choice
+ ) , 
+default
+ = 
+collection
+ . 
+default_calendar_name
+ )
+
+243 
+	=number
+ = 
+	`int
+ ( 
+value
+ )
+
+244 
+	=calendar_name
+ = 
+collection
+ . 
+writable_names
+ [ 
+number
+ ]
+
+246 except ( 
+ValueError
+ , 
+IndexError
+ ) :
+
+247 
+	=matches
+ = 
+	`filter
+ ( lambda 
+x
+ : 
+x
+ . 
+	`startswith
+ ( 
+value
+ ) , 
+collection
+ . 
+writable_names
+ )
+
+248 if 
+	`len
+ ( 
+matches
+ ) == 1 :
+
+249 
+	=calendar_name
+ = 
+matches
+ [ 0 ]
+
+251 
+	`echo
+ ( 'invalid choice' )
+
+253 if 
+batch
+ or 
+	`confirm
+ ( "Do you want to import this event into `{}`?" ""
+
+254 . 
+	`format
+ ( 
+calendar_name
+ ) ) :
+
+255 
+	=ics
+ = 
+aux
+ . 
+	`ics_from_list
+ ( 
+vevent
+ , 
+random_uid
+ )
+
+257 
+collection
+ . 
+	`new
+ (
+
+258 
+	`Item
+ ( 
+ics
+ . 
+	`to_ical
+ ( ) . 
+	`decode
+ ( 'utf-8' ) ) ,
+
+259 
+collection
+ = 
+calendar_name
+ )
+
+260 except 
+DuplicateUid
+ :
+
+261 if 
+batch
+ or 
+	`confirm
+ ( "An event with the same UID already exists. " "Do you want to update it?"
+
+263 
+collection
+ . 
+	`force_update
+ (
+
+264 
+	`Item
+ ( 
+ics
+ . 
+	`to_ical
+ ( ) . 
+	`decode
+ ( 'utf-8' ) ) ,
+
+265 
+collection
+ = 
+calendar_name
+ )
+
+267 
+logger
+ . 
+	`warn
+ ( "Not importing event with UID `{}`" . 
+	`format
+ ( 
+event
+ . 
+uid
+ ) ) 
+	}
+
+
+	@./__init__.py
+
+24 from 
+	~khal.version
+ import 
+version
+
+25 except 
+ImportError
+ :
+
+26 import 
+	~sys
+
+27 
+sys
+ . 
+	`exit
+ ( 'Failed to find (autogenerated) version.py. This might be due to ' 'using GitHub\'s tarballs or svn access. Either clone ' 'from GitHub via git or get a tarball from PyPI.'
+
+31 
+	=__productname__
+ = 'khal'
+
+32 
+	=__version__
+ = 
+version
+
+33 
+	=__author__
+ = 'Christian Geier'
+
+34 
+	=__copyright__
+ = 'Copyright (c) 2013-2015 Christian Geier et al.'
+
+35 
+	=__author_email__
+ = 'khal@lostpackets.de'
+
+36 
+	=__description__
+ = 'A CalDAV based calendar'
+
+37 
+	=__license__
+ = 'Expat/MIT, see COPYING'
+
+38 
+	=__homepage__
+ = 'http://lostpackets.de/khal/'
+
+
+	@./cli.py
+
+23 import 
+	~logging
+
+24 import 
+	~sys
+
+25 import 
+	~textwrap
+
+28 from 
+	~setproctitle
+ import 
+setproctitle
+
+29 except 
+ImportError
+ :
+
+30 def 
+	$setproctitle
+ ( 
+x
+ ) :
+
+31 pass 
+	}
+
+33 import 
+	~click
+
+34 import 
+	~pytz
+
+36 from 
+	~khal
+ import 
+aux
+ , 
+controllers
+ , 
+khalendar
+ , 
+__version__
+
+37 from 
+	~khal.log
+ import 
+logger
+
+38 from 
+	~khal.settings
+ import 
+get_config
+ , 
+InvalidSettingsError
+
+39 from 
+	~khal.exceptions
+ import 
+FatalError
+
+40 from . 
+	~compat
+ import 
+to_unicode
+
+41 from . 
+	~terminal
+ import 
+colored
+ , 
+get_terminal_size
+
+44 
+	=days_option
+ = 
+click
+ . 
+	`option
+ ( '--days' , 
+default
+ = None , 
+type
+ = 
+int
+ ,
+
+45 
+help
+ = 'How many days to include.' )
+
+46 
+	=events_option
+ = 
+click
+ . 
+	`option
+ ( '--events' , 
+default
+ = None , 
+type
+ = 
+int
+ ,
+
+47 
+help
+ = 'How many events to include.' )
+
+48 
+	=dates_arg
+ = 
+click
+ . 
+	`argument
+ ( 'dates' , 
+nargs
+ = - 1 )
+
+51 def 
+	$time_args
+ ( 
+f
+ ) :
+
+52 return 
+	`dates_arg
+ ( 
+	`events_option
+ ( 
+	`days_option
+ ( 
+f
+ ) ) ) 
+	}
+
+55 def 
+	$_multi_calendar_select_callback
+ ( 
+ctx
+ , 
+option
+ , 
+calendars
+ ) :
+
+56 if not 
+calendars
+ :
+
+58 if 'calendar_selection' in 
+ctx
+ . 
+obj
+ :
+
+59 raise 
+click
+ . 
+	`UsageError
+ ( 'Can\'t use both -a and -d.' )
+
+60 if not 
+	`isinstance
+ ( 
+calendars
+ , 
+tuple
+ ) :
+
+61 
+	=calendars
+ = ( 
+calendars
+ , )
+
+63 
+	=mode
+ = 
+option
+ . 
+name
+
+64 
+	=selection
+ = 
+ctx
+ . 
+	=obj
+ [ 'calendar_selection' ] = 
+	`set
+ ( )
+
+66 if 
+mode
+ == 'include_calendar' :
+
+67 for 
+cal_name
+ in 
+calendars
+ :
+
+68 if 
+cal_name
+ not in 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'calendars' ] :
+
+69 raise 
+click
+ . 
+	`BadParameter
+ ( 'Unknown calendar {}, run `khal printcalendars` to get a ' 'list of all configured calendars.'
+
+71 . 
+	`format
+ ( 
+cal_name
+ )
+
+74 
+selection
+ . 
+	`update
+ ( 
+calendars
+ )
+
+75 elif 
+mode
+ == 'exclude_calendar' :
+
+76 
+selection
+ . 
+	`update
+ ( 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'calendars' ] . 
+	`keys
+ ( ) )
+
+77 for 
+value
+ in 
+calendars
+ :
+
+78 
+calendars
+ . 
+	`remove
+ ( 
+value
+ )
+
+80 raise 
+	`ValueError
+ ( 
+mode
+ ) 
+	}
+
+83 def 
+	$multi_calendar_option
+ ( 
+f
+ ) :
+
+84 
+	=a
+ = 
+click
+ . 
+	`option
+ ( '--include-calendar' , '-a' , 
+multiple
+ = True , 
+metavar
+ = 'CAL' ,
+
+85 
+expose_value
+ = False ,
+
+86 
+callback
+ = 
+_multi_calendar_select_callback
+ ,
+
+87 
+help
+ = ( 'Include the given calendar. Can be specified ' 'multiple times.'
+
+89 
+	=d
+ = 
+click
+ . 
+	`option
+ ( '--exclude-calendar' , '-d' , 
+multiple
+ = True , 
+metavar
+ = 'CAL' ,
+
+90 
+expose_value
+ = False ,
+
+91 
+callback
+ = 
+_multi_calendar_select_callback
+ ,
+
+92 
+help
+ = ( 'Exclude the given calendar. Can be specified ' 'multiple times.'
+
+95 return 
+	`d
+ ( 
+	`a
+ ( 
+f
+ ) ) 
+	}
+
+98 def 
+	$_calendar_select_callback
+ ( 
+ctx
+ , 
+option
+ , 
+calendar
+ ) :
+
+99 
+	=calendar
+ = 
+calendar
+ or 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'default' ] [ 'default_calendar' ]
+
+100 if not 
+calendar
+ :
+
+101 raise 
+click
+ . 
+	`BadParameter
+ ( 'No default calendar is configured, ' 'please provide one explicitly.'
+
+105 if 
+calendar
+ not in 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'calendars' ] :
+
+106 raise 
+click
+ . 
+	`BadParameter
+ ( 'Unknown calendar {}, run `khal printcalendars` to get a ' 'list of all configured calendars.'
+
+108 . 
+	`format
+ ( 
+calendar
+ )
+
+111 return 
+calendar
+ 
+	}
+
+114 def 
+	$calendar_option
+ ( 
+f
+ ) :
+
+115 return 
+click
+ . 
+	`option
+ ( '--calendar' , '-a' , 
+metavar
+ = 'CAL' ,
+
+116 
+callback
+ = 
+_calendar_select_callback
+ ) ( 
+f
+ ) 
+	}
+
+119 def 
+	$global_options
+ ( 
+f
+ ) :
+
+120 
+	=config
+ = 
+click
+ . 
+	`option
+ ( '--config' , '-c' , 
+default
+ = None , 
+metavar
+ = 'PATH' ,
+
+121 
+help
+ = 'The config file to use.' )
+
+122 
+	=verbose
+ = 
+click
+ . 
+	`option
+ ( '--verbose' , '-v' , 
+is_flag
+ = True ,
+
+123 
+help
+ = 'Output debugging information.' )
+
+124 
+	=version
+ = 
+click
+ . 
+	`version_option
+ ( 
+version
+ = 
+__version__
+ )
+
+126 return 
+	`config
+ ( 
+	`verbose
+ ( 
+	`version
+ ( 
+f
+ ) ) ) 
+	}
+
+129 def 
+	$build_collection
+ ( 
+ctx
+ ) :
+
+131 
+	=conf
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ]
+
+132 
+	=collection
+ = 
+khalendar
+ . 
+	`CalendarCollection
+ ( )
+
+133 
+	=selection
+ = 
+ctx
+ . 
+obj
+ . 
+	`get
+ ( 'calendar_selection' , None )
+
+135 for 
+name
+ , 
+cal
+ in 
+conf
+ [ 'calendars' ] . 
+	`items
+ ( ) :
+
+136 if 
+selection
+ is None or 
+name
+ in 
+ctx
+ . 
+obj
+ [ 'calendar_selection' ] :
+
+137 
+collection
+ . 
+	`append
+ ( 
+khalendar
+ . 
+	`Calendar
+ (
+
+138 
+name
+ = 
+name
+ ,
+
+139 
+dbpath
+ = 
+conf
+ [ 'sqlite' ] [ 'path' ] ,
+
+140 
+path
+ = 
+cal
+ [ 'path' ] ,
+
+141 
+readonly
+ = 
+cal
+ [ 'readonly' ] ,
+
+142 
+color
+ = 
+cal
+ [ 'color' ] ,
+
+143 
+unicode_symbols
+ = 
+conf
+ [ 'locale' ] [ 'unicode_symbols' ] ,
+
+144 
+locale
+ = 
+conf
+ [ 'locale' ] ,
+
+145 
+ctype
+ = 
+cal
+ [ 'type' ] ,
+
+147 except 
+FatalError
+ as 
+error
+ :
+
+148 
+logger
+ . 
+	`fatal
+ ( 
+error
+ )
+
+149 
+sys
+ . 
+	`exit
+ ( 1 )
+
+151 
+collection
+ . 
+	=_default_calendar_name
+ = 
+conf
+ [ 'default' ] [ 'default_calendar' ]
+
+152 return 
+collection
+ 
+	}
+
+155 def 
+	$prepare_context
+ ( 
+ctx
+ , 
+config
+ , 
+verbose
+ ) :
+
+156 if 
+ctx
+ . 
+obj
+ is not None :
+
+159 if 
+verbose
+ :
+
+160 
+logger
+ . 
+	`setLevel
+ ( 
+logging
+ . 
+DEBUG
+ )
+
+162 
+logger
+ . 
+	`setLevel
+ ( 
+logging
+ . 
+INFO
+ )
+
+164 
+ctx
+ . 
+	=obj
+ = { }
+
+166 
+ctx
+ . 
+	=obj
+ [ 'conf' ] = 
+	=conf
+ = 
+	`get_config
+ ( 
+config
+ )
+
+167 except 
+InvalidSettingsError
+ :
+
+168 
+sys
+ . 
+	`exit
+ ( 1 )
+
+170 
+logger
+ . 
+	`debug
+ ( 'khal %s' % 
+__version__
+ )
+
+171 
+logger
+ . 
+	`debug
+ ( 'Using config:' )
+
+172 
+logger
+ . 
+	`debug
+ ( 
+	`to_unicode
+ ( 
+	`stringify_conf
+ ( 
+conf
+ ) , 'utf-8' ) )
+
+174 if 
+conf
+ is None :
+
+175 raise 
+click
+ . 
+	`UsageError
+ ( 'Invalid config file, exiting.' ) 
+	}
+
+178 def 
+	$stringify_conf
+ ( 
+conf
+ ) :
+
+181 
+	=out
+ = 
+	`list
+ ( )
+
+182 for 
+key
+ , 
+value
+ in 
+conf
+ . 
+	`items
+ ( ) :
+
+183 
+out
+ . 
+	`append
+ ( '[{}]' . 
+	`format
+ ( 
+key
+ ) )
+
+184 for 
+subkey
+ , 
+subvalue
+ in 
+value
+ . 
+	`items
+ ( ) :
+
+185 if 
+	`isinstance
+ ( 
+subvalue
+ , 
+dict
+ ) :
+
+186 
+out
+ . 
+	`append
+ ( '  [[{}]]' . 
+	`format
+ ( 
+subkey
+ ) )
+
+187 for 
+subsubkey
+ , 
+subsubvalue
+ in 
+subvalue
+ . 
+	`items
+ ( ) :
+
+188 
+out
+ . 
+	`append
+ ( '    {}: {}' . 
+	`format
+ ( 
+subsubkey
+ , 
+subsubvalue
+ ) )
+
+190 
+out
+ . 
+	`append
+ ( '  {}: {}' . 
+	`format
+ ( 
+subkey
+ , 
+subvalue
+ ) )
+
+191 return '\n' . 
+	`join
+ ( 
+out
+ ) 
+	}
+
+194 def 
+	$_get_cli
+ ( ) :
+
+195 @ 
+click
+ . 
+	`group
+ ( 
+invoke_without_command
+ = True )
+
+196 @ 
+	`global_options
+
+197 @ 
+click
+ . 
+	`pass_context
+
+198 def 
+cli
+ ( 
+ctx
+ , 
+config
+ , 
+verbose
+ ) :
+
+202 
+	`setproctitle
+ ( 'khal' )
+
+203 
+	`prepare_context
+ ( 
+ctx
+ , 
+config
+ , 
+verbose
+ )
+
+205 if not 
+ctx
+ . 
+invoked_subcommand
+ :
+
+206 
+	=command
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'default' ] [ 'default_command' ]
+
+207 if 
+command
+ :
+
+208 
+ctx
+ . 
+	`invoke
+ ( 
+cli
+ . 
+commands
+ [ 
+command
+ ] )
+
+210 
+click
+ . 
+	`echo
+ ( 
+ctx
+ . 
+	`get_help
+ ( ) )
+
+211 
+ctx
+ . 
+	`exit
+ ( 1 )
+
+213 @ 
+cli
+ . 
+	`command
+ ( )
+
+214 @ 
+	`time_args
+
+215 @ 
+	`multi_calendar_option
+
+216 @ 
+click
+ . 
+	`pass_context
+
+217 def 
+calendar
+ ( 
+ctx
+ , 
+days
+ , 
+events
+ , 
+dates
+ ) :
+
+219 
+controllers
+ . 
+	`calendar
+ (
+
+220 
+	`build_collection
+ ( 
+ctx
+ ) ,
+
+221 
+date
+ = 
+dates
+ ,
+
+222 
+firstweekday
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'firstweekday' ] ,
+
+223 
+encoding
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'encoding' ] ,
+
+224 
+locale
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] ,
+
+225 
+weeknumber
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'weeknumbers' ] ,
+
+226 
+show_all_days
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'default' ] [ 'show_all_days' ] ,
+
+227 
+days
+ = 
+days
+ or 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'default' ] [ 'days' ] ,
+
+228 
+events
+ = 
+events
+
+231 @ 
+cli
+ . 
+	`command
+ ( )
+
+232 @ 
+	`time_args
+
+233 @ 
+	`multi_calendar_option
+
+234 @ 
+click
+ . 
+	`pass_context
+
+235 def 
+agenda
+ ( 
+ctx
+ , 
+days
+ , 
+events
+ , 
+dates
+ ) :
+
+237 
+controllers
+ . 
+	`agenda
+ (
+
+238 
+	`build_collection
+ ( 
+ctx
+ ) ,
+
+239 
+date
+ = 
+dates
+ ,
+
+240 
+firstweekday
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'firstweekday' ] ,
+
+241 
+encoding
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'encoding' ] ,
+
+242 
+show_all_days
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'default' ] [ 'show_all_days' ] ,
+
+243 
+locale
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] ,
+
+244 
+days
+ = 
+days
+ or 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'default' ] [ 'days' ] ,
+
+245 
+events
+ = 
+events
+ ,
+
+248 @ 
+cli
+ . 
+	`command
+ ( )
+
+249 @ 
+	`calendar_option
+
+250 @ 
+click
+ . 
+	`option
+ ( '--location' , '-l' ,
+
+251 
+help
+ = ( 'The location of the new event.' ) )
+
+252 @ 
+click
+ . 
+	`option
+ ( '--repeat' , '-r' ,
+
+253 
+help
+ = ( 'Repeat event: daily, weekly, monthly or yearly.' ) )
+
+254 @ 
+click
+ . 
+	`option
+ ( '--until' , '-u' ,
+
+255 
+help
+ = ( 'Stop an event repeating on this date.' ) )
+
+256 @ 
+click
+ . 
+	`argument
+ ( 'description' , 
+nargs
+ = - 1 , 
+required
+ = True )
+
+257 @ 
+click
+ . 
+	`pass_context
+
+258 def 
+new
+ ( 
+ctx
+ , 
+calendar
+ , 
+description
+ , 
+location
+ , 
+repeat
+ , 
+until
+ ) :
+
+260 
+controllers
+ . 
+	`new_from_string
+ (
+
+261 
+	`build_collection
+ ( 
+ctx
+ ) ,
+
+262 
+calendar
+ ,
+
+263 
+ctx
+ . 
+obj
+ [ 'conf' ] ,
+
+264 
+	`list
+ ( 
+description
+ ) ,
+
+265 
+location
+ = 
+location
+ ,
+
+266 
+repeat
+ = 
+repeat
+ ,
+
+267 
+until
+ = 
+until
+ . 
+	`split
+ ( ' ' ) if 
+until
+ is not None else None ,
+
+270 @ 
+cli
+ . 
+	`command
+ ( 'import' )
+
+271 @ 
+click
+ . 
+	`option
+ ( '--include-calendar' , '-a' , 
+help
+ = ( 'The calendar to use.' ) ,
+
+272 
+expose_value
+ = False , 
+callback
+ = 
+_calendar_select_callback
+ ,
+
+273 
+metavar
+ = 'CAL' )
+
+274 @ 
+click
+ . 
+	`option
+ ( '--batch' , 
+help
+ = ( 'do not ask for any confirmation.' ) ,
+
+275 
+is_flag
+ = True )
+
+276 @ 
+click
+ . 
+	`option
+ ( '--random_uid' , '-r' , 
+help
+ = ( 'Select a random uid.' ) ,
+
+277 
+is_flag
+ = True )
+
+278 @ 
+click
+ . 
+	`argument
+ ( 'ics' , 
+type
+ = 
+click
+ . 
+	`File
+ ( 'rb' ) )
+
+279 @ 
+click
+ . 
+	`pass_context
+
+280 def 
+import_ics
+ ( 
+ctx
+ , 
+ics
+ , 
+batch
+ , 
+random_uid
+ ) :
+
+293 
+	=ics_str
+ = 
+ics
+ . 
+	`read
+ ( )
+
+294 
+controllers
+ . 
+	`import_ics
+ (
+
+295 
+	`build_collection
+ ( 
+ctx
+ ) ,
+
+296 
+ctx
+ . 
+obj
+ [ 'conf' ] ,
+
+297 
+ics
+ = 
+ics_str
+ ,
+
+298 
+batch
+ = 
+batch
+ ,
+
+299 
+random_uid
+ = 
+random_uid
+
+302 @ 
+cli
+ . 
+	`command
+ ( )
+
+303 @ 
+	`multi_calendar_option
+
+304 @ 
+click
+ . 
+	`pass_context
+
+305 def 
+interactive
+ ( 
+ctx
+ ) :
+
+307 
+controllers
+ . 
+	`interactive
+ ( 
+	`build_collection
+ ( 
+ctx
+ ) , 
+ctx
+ . 
+obj
+ [ 'conf' ] )
+
+309 @ 
+click
+ . 
+	`command
+ ( )
+
+310 @ 
+	`multi_calendar_option
+
+311 @ 
+	`global_options
+
+312 @ 
+click
+ . 
+	`pass_context
+
+313 def 
+interactive_cli
+ ( 
+ctx
+ , 
+config
+ , 
+verbose
+ ) :
+
+315 
+	`prepare_context
+ ( 
+ctx
+ , 
+config
+ , 
+verbose
+ )
+
+316 
+controllers
+ . 
+	`interactive
+ ( 
+	`build_collection
+ ( 
+ctx
+ ) , 
+ctx
+ . 
+obj
+ [ 'conf' ] )
+
+318 @ 
+cli
+ . 
+	`command
+ ( )
+
+319 @ 
+	`multi_calendar_option
+
+320 @ 
+click
+ . 
+	`pass_context
+
+321 def 
+printcalendars
+ ( 
+ctx
+ ) :
+
+323 
+click
+ . 
+	`echo
+ ( '\n' . 
+	`join
+ ( 
+	`build_collection
+ ( 
+ctx
+ ) . 
+names
+ ) )
+
+325 @ 
+cli
+ . 
+	`command
+ ( )
+
+326 @ 
+click
+ . 
+	`pass_context
+
+327 def 
+printformats
+ ( 
+ctx
+ ) :
+
+333 from 
+	~datetime
+ import 
+datetime
+
+334 
+	=time
+ = 
+	`datetime
+ ( 2013 , 12 , 21 , 10 , 9 )
+
+336 for 
+strftime_format
+ in [ 'longdatetimeformat'
+
+339 
+	=dt_str
+ = 
+time
+ . 
+	`strftime
+ ( 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 
+strftime_format
+ ] )
+
+340 
+click
+ . 
+	`echo
+ ( '{}: {}' . 
+	`format
+ ( 
+strftime_format
+ , 
+dt_str
+ ) )
+
+342 @ 
+cli
+ . 
+	`command
+ ( )
+
+343 @ 
+	`multi_calendar_option
+
+344 @ 
+click
+ . 
+	`argument
+ ( 'search_string' )
+
+345 @ 
+click
+ . 
+	`pass_context
+
+346 def 
+search
+ ( 
+ctx
+ , 
+search_string
+ ) :
+
+352 
+	=collection
+ = 
+	`build_collection
+ ( 
+ctx
+ )
+
+353 
+	=events
+ = 
+collection
+ . 
+	`search
+ ( 
+search_string
+ )
+
+354 
+	=event_column
+ = 
+	`list
+ ( )
+
+355 
+	=term_width
+ , 
+	=_
+ = 
+	`get_terminal_size
+ ( )
+
+356 for 
+event
+ in 
+events
+ :
+
+357 
+	=desc
+ = 
+textwrap
+ . 
+	`wrap
+ ( 
+event
+ . 
+event_description
+ , 
+term_width
+ )
+
+358 
+event_column
+ . 
+	`extend
+ ( [ 
+	`colored
+ ( 
+d
+ , 
+event
+ . 
+color
+ ) for 
+d
+ in 
+desc
+ ] )
+
+359 
+click
+ . 
+	`echo
+ ( 
+	`to_unicode
+ ( '\n'
+
+360 . 
+	`join
+ ( 
+event_column
+ ) ,
+
+361 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'encoding' ] )
+
+364 @ 
+cli
+ . 
+	`command
+ ( )
+
+365 @ 
+	`multi_calendar_option
+
+366 @ 
+click
+ . 
+	`argument
+ ( 'datetime' , 
+required
+ = False , 
+nargs
+ = - 1 )
+
+367 @ 
+click
+ . 
+	`pass_context
+
+368 def 
+at
+ ( 
+ctx
+ , 
+datetime
+ = None ) :
+
+375 
+	=collection
+ = 
+	`build_collection
+ ( 
+ctx
+ )
+
+376 
+	=locale
+ = 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ]
+
+377 
+	=dtime_list
+ = 
+	`list
+ ( 
+datetime
+ )
+
+378 if 
+dtime_list
+ == [ ] or 
+dtime_list
+ == [ 'now' ] :
+
+379 import 
+	~datetime
+
+380 
+	=dtime
+ = 
+datetime
+ . 
+datetime
+ . 
+	`now
+ ( )
+
+383 
+	=dtime
+ , 
+	=_
+ = 
+aux
+ . 
+	`guessdatetimefstr
+ ( 
+dtime_list
+ , 
+locale
+ )
+
+384 except 
+ValueError
+ :
+
+385 
+logger
+ . 
+	`fatal
+ ( '{} is not a valid datetime (matches neither {} nor {} nor' ' {})'
+
+387 . 
+	`format
+ ( ' '
+
+388 . 
+	`join
+ ( 
+dtime_list
+ ) ,
+
+389 
+locale
+ [ 'timeformat' ] ,
+
+390 
+locale
+ [ 'datetimeformat' ] ,
+
+391 
+locale
+ [ 'longdatetimeformat' ] ) )
+
+392 
+sys
+ . 
+	`exit
+ ( 1 )
+
+393 
+	=dtime
+ = 
+locale
+ [ 'local_timezone' ] . 
+	`localize
+ ( 
+dtime
+ )
+
+394 
+	=dtime
+ = 
+dtime
+ . 
+	`astimezone
+ ( 
+pytz
+ . 
+UTC
+ )
+
+395 
+	=events
+ = 
+collection
+ . 
+	`get_events_at
+ ( 
+dtime
+ )
+
+396 
+	=event_column
+ = 
+	`list
+ ( )
+
+397 
+	=term_width
+ , 
+	=_
+ = 
+	`get_terminal_size
+ ( )
+
+398 for 
+event
+ in 
+events
+ :
+
+399 
+	=desc
+ = 
+textwrap
+ . 
+	`wrap
+ ( 
+event
+ . 
+event_description
+ , 
+term_width
+ )
+
+400 
+event_column
+ . 
+	`extend
+ ( [ 
+	`colored
+ ( 
+d
+ , 
+event
+ . 
+color
+ ) for 
+d
+ in 
+desc
+ ] )
+
+401 
+click
+ . 
+	`echo
+ ( 
+	`to_unicode
+ ( '\n'
+
+402 . 
+	`join
+ ( 
+event_column
+ ) ,
+
+403 
+ctx
+ . 
+obj
+ [ 'conf' ] [ 'locale' ] [ 'encoding' ] )
+
+406 return 
+cli
+ , 
+interactive_cli
+ 
+	}
+
+408 
+	=main_khal
+ , 
+	=main_ikhal
+ = 
+	`_get_cli
+ ( )
+
+
+	@./compat.py
+
+23 import 
+	~sys
+
+26 def 
+	$to_unicode
+ ( 
+string
+ , * 
+args
+ , ** 
+kwargs
+ ) :
+
+27 if not 
+	`isinstance
+ ( 
+string
+ , 
+unicode_type
+ ) :
+
+28 return 
+string
+ . 
+	`decode
+ ( * 
+args
+ , ** 
+kwargs
+ )
+
+29 return 
+string
+ 
+	}
+
+32 def 
+	$to_bytes
+ ( 
+string
+ , * 
+args
+ , ** 
+kwargs
+ ) :
+
+33 if not 
+	`isinstance
+ ( 
+string
+ , 
+bytes_type
+ ) :
+
+34 return 
+string
+ . 
+	`encode
+ ( * 
+args
+ , ** 
+kwargs
+ )
+
+35 return 
+string
+ 
+	}
+
+38 if 
+sys
+ . 
+version_info
+ [ 0 ] == 2 :
+
+39 
+	=VERSION
+ = 2
+
+40 
+	=unicode_type
+ = 
+unicode
+
+41 
+	=bytes_type
+ = 
+str
+
+42 
+	=to_native
+ = 
+to_bytes
+
+44 def 
+	$iteritems
+ ( 
+d
+ , * 
+args
+ , ** 
+kwargs
+ ) :
+
+45 return 
+	`iter
+ ( 
+d
+ . 
+	`iteritems
+ ( * 
+args
+ , ** 
+kwargs
+ ) ) 
+	}
+
+47 
+	=VERSION
+ = 3
+
+48 
+	=unicode_type
+ = 
+str
+
+49 
+	=bytes_type
+ = 
+bytes
+
+50 
+	=to_native
+ = 
+to_unicode
+
+52 def 
+	$iteritems
+ ( 
+d
+ , * 
+args
+ , ** 
+kwargs
+ ) :
+
+53 return 
+	`iter
+ ( 
+d
+ . 
+	`items
+ ( * 
+args
+ , ** 
+kwargs
+ ) ) 
+	}
+
+
+	@
+1
+.
+0
+10
+135
+./version.py
+./calendar_display.py
+./log.py
+./exceptions.py
+./aux.py
+./terminal.py
+./controllers.py
+./__init__.py
+./cli.py
+./compat.py
