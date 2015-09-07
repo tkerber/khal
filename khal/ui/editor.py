@@ -13,8 +13,13 @@ def external_editor(editor, event, current_day):
     tf.write(old_template)
     tf.close()
     # start editor to edit template
+<<<<<<< HEAD
     # have tried .call .Popen and os.system - none have worked
     child = subprocess.call([editor, temp_file_name])
+=======
+    child = subprocess.Popen([editor, temp_file_name])
+    child.communicate()[0]
+>>>>>>> b0dba97faff8f975412e385239840a86d02ce31e
     # read temp file contents after editing
     tf = open(temp_file_name, "r")
     new_template = tf.read()
