@@ -255,7 +255,9 @@ class EventColumn(urwid.WidgetWrap):
             xeditor = self.pane.conf['default']['editor']
             if not xeditor:
                 xeditor = os.getenv('EDITOR')
+            self.pane.window.loop.stop()
             external_editor(xeditor, event, self.events.events)
+            self.pane.window.loop.start()
             return
 
         self.editor = True
@@ -613,6 +615,7 @@ def start_pane(pane, callback, program_info=''):
     loop = urwid.MainLoop(frame, getattr(colors, pane.conf['view']['theme']),
                           unhandled_input=frame.on_key_press,
                           pop_ups=True)
+    frame.loop = loop
 
     def ctrl_c(signum, f):
         raise urwid.ExitMainLoop()
