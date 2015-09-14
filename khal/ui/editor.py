@@ -105,7 +105,7 @@ def process_user_input(input):
         if line == "" or line.startswith("#"):
             continue
         try:
-            obj = line.split(":")
+            obj = line.split(':', 1)
             key = obj[0].strip().lower()
             value = obj[1].strip()
             data[key] = value.decode("utf-8")
