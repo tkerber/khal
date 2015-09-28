@@ -24,6 +24,9 @@ def external_editor(editor, event, current_day):
     # check if the user changed anything
     if old_template != new_template:
         new_event = process_user_input(new_template)
+        # not sure if this is the best place, but this needs to be done
+        # somewhere
+        new_event.increment_sequence()
         if event.etag:
             return
             # update event
