@@ -256,14 +256,15 @@ class EventColumn(urwid.WidgetWrap):
             if not xeditor:
                 xeditor = os.getenv('EDITOR')
             self.pane.window.loop.stop()
-            event = external_editor(xeditor, event, self.events.events)
-            if self.event.etag is None:  # has not been saved before
+            event = external_editor(xeditor, event, self.events.events,
+                                    locale=self.pane.conf['locale'])
+            if event.etag is None:  # has not been saved before
                 # a calendar has to be chosen somehow, the default calendar
                 # would be a start
                 # self.event.calendar = self.calendar_chooser.active.name
-                self.collection.new(self.event)
+                self.pane.collection.new(event)
             else:
-                self.collection.update(self.event)
+                self.pane.collection.update(event)
             self.pane.window.loop.start()
             return
 
