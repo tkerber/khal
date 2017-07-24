@@ -293,7 +293,7 @@ def expand(vevent, href=''):
     """
     # we do this now and than never care about the "real" end time again
     if 'DURATION' in vevent:
-        duration = vevent['DURATION'].dt
+        duration = vevent['DURATION'].td
     else:
         duration = vevent['DTEND'].dt - vevent['DTSTART'].dt
 

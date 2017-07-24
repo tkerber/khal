@@ -83,7 +83,7 @@ class Event(object):
                 self._end = self._vevents[self.ref]['DTEND'].dt
             except KeyError:
                 try:
-                    self._end = self._start + self._vevents[self.ref]['DURATION'].dt
+                    self._end = self._start + self._vevents[self.ref]['DURATION'].td
                 except KeyError:
                     self._end = self._start + dt.timedelta(days=1)
 
@@ -281,7 +281,7 @@ class Event(object):
     @property
     def duration(self):
         try:
-            return self._vevents[self.ref]['DURATION'].dt
+            return self._vevents[self.ref]['DURATION'].td
         except KeyError:
             return self.end - self.start
 
@@ -370,7 +370,7 @@ class Event(object):
         """
         Decides whether we can handle a certain alarm.
         """
-        return alarm.get('ACTION') == 'DISPLAY' and isinstance(alarm.get('TRIGGER').dt, dt.timedelta)
+        return alarm.get('ACTION') == 'DISPLAY' and isinstance(alarm.get('TRIGGER').td, dt.timedelta)
 
     @property
     def alarms(self):
@@ -378,7 +378,7 @@ class Event(object):
         Returns a list of all alarms in th original event that we can handle. Unknown types of
         alarms are ignored.
         """
-        return [(a.get('TRIGGER').dt, a.get('DESCRIPTION'))
+        return [(a.get('TRIGGER').td, a.get('DESCRIPTION'))
                 for a in self._vevents[self.ref].subcomponents
                 if a.name == 'VALARM' and self._can_handle_alarm(a)]
 
@@ -721,7 +721,7 @@ class AllDayEvent(Event):
     @property
     def duration(self):
         try:
-            return self._vevents[self.ref]['DURATION'].dt
+            return self._vevents[self.ref]['DURATION'].td
         except KeyError:
             return self.end - self.start + dt.timedelta(days=1)
 
