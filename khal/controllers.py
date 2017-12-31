@@ -26,12 +26,13 @@ import os
 import textwrap
 from collections import OrderedDict, defaultdict
 from shutil import get_terminal_size
+import icalendar
 
 import pytz
 from click import confirm, echo, prompt, style
 from khal import (__productname__, __version__, calendar_display,
                   parse_datetime, utils)
-from khal.exceptions import FatalError, DateTimeParseError
+from khal.exceptions import FatalError, DateTimeParseError, InvalidVevent
 from khal.khalendar.event import Event
 from khal.khalendar.exceptions import DuplicateUid, ReadOnlyCalendarError
 

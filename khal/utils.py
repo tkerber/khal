@@ -31,12 +31,14 @@ from calendar import month_abbr, timegm
 from collections import defaultdict
 from textwrap import wrap
 
+from typing import DefaultDict, Dict, List, Optional, Set, Tuple, Union
+
 import dateutil.rrule
 import icalendar
 import khal.parse_datetime as parse_datetime  # TODO get this out of here
 import pytz
 
-from .exceptions import UnsupportedRecurrence
+from .exceptions import InvalidVevent, UnsupportedRecurrence
 
 logger = logging.getLogger('khal')
 
@@ -112,20 +114,18 @@ def new_event(locale, dtstart=None, dtend=None, summary=None, timezone=None,
     return event
 
 
-def split_ics(ics, random_uid=False, default_timezone=None):
+def split_ics(ics: str, random_uid: bool=False, default_timezone=None) -> List[str]:
     """split an ics string into several according to VEVENT's UIDs
 
-    and sort the right VTIMEZONEs accordingly
-    ignores all other ics components
-    :type ics: str
+    and sort the right VTIMEZONEs accordingly, ignores all other ics components
+
     :param random_uid: assign random uids to all events
-    :type random_uid: bool
-    :rtype list:
     """
     cal = cal_from_ics(ics)
     tzs = {item['TZID']: item for item in cal.walk() if item.name == 'VTIMEZONE'}
 
-    events_grouped = defaultdict(list)
+    events_grouped = defaultdict(list)  # type: DefaultDict[str, icalendar.Event]
+
     for item in cal.walk():
         if item.name == 'VEVENT':
             events_grouped[item['UID']].append(item)
@@ -135,15 +135,16 @@ def split_ics(ics, random_uid=False, default_timezone=None):
             sorted(events_grouped.items())]
 
 
-def ics_from_list(events, tzs, random_uid=False, default_timezone=None):
+def ics_from_list(events: List[icalendar.Event],
+                  tzs: Dict[str, icalendar.Timezone],
+                  random_uid: bool=False,
+                  default_timezone: Optional[pytz._BaseTzInfo]=None,
+                  ) -> str:
     """convert an iterable of icalendar.Events to an icalendar.Calendar
 
     :params events: list of events all with the same uid
-    :type events: list(icalendar.cal.Event)
     :param random_uid: assign random uids to all events
-    :type random_uid: bool
     :param tzs: collection of timezones
-    :type tzs: dict(icalendar.cal.Vtimzone
     """
     calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
@@ -154,7 +155,7 @@ def ics_from_list(events, tzs, random_uid=False, default_timezone=None):
     if random_uid:
         new_uid = generate_random_uid()
 
-    needed_tz, missing_tz = set(), set()
+    needed_tz, missing_tz = set(), set()  # type: Set[str], Set[str]
     for sub_event in events:
         sub_event = sanitize(sub_event, default_timezone=default_timezone)
         if random_uid:
@@ -209,7 +210,7 @@ ansi_sgr = re.compile(r'\x1b\['
                       'm')
 
 
-def find_last_reset(string):
+def find_last_reset(string: str) -> Tuple[int, int, str]:
     for match in re.finditer(ansi_reset, string):
         pass
     try:
@@ -218,7 +219,7 @@ def find_last_reset(string):
         return -2, -1, ''
 
 
-def find_last_sgr(string):
+def find_last_sgr(string: str) -> Tuple[int, int, str]:
     for match in re.finditer(ansi_sgr, string):
         pass
     try:
@@ -227,9 +228,9 @@ def find_last_sgr(string):
         return -2, -1, ''
 
 
-def find_unmatched_sgr(string):
-    reset_pos, _, _ = find_last_reset(string)
-    sgr_pos, _, sgr = find_last_sgr(string)
+def find_unmatched_sgr(string: str) -> Union[bool, str]:
+    reset_pos, _1, _2 = find_last_reset(string)
+    sgr_pos, _3, sgr = find_last_sgr(string)
     if sgr_pos > reset_pos:
         return sgr
     else:
@@ -383,24 +384,23 @@ def expand(vevent, href=''):
     return dtstartend
 
 
-def sanitize(vevent, default_timezone, href='', calendar=''):
+def sanitize(vevent: icalendar.Event,
+             default_timezone: pytz._BaseTzInfo,
+             href: str='',
+             calendar: str='',
+             ) -> icalendar.Event:
     """
     clean up vevents we do not understand
 
     :param vevent: the vevent that needs to be cleaned
-    :type vevent: icalendar.cal.Event
     :param default_timezone: timezone to apply to start and/or end dates which
          were supposed to be localized but which timezone was not understood
          by icalendar
-    :type timezone: pytz.timezone
     :param href: used for logging to inform user which .ics files are
         problematic
-    :type href: str
     :param calendar: used for logging to inform user which .ics files are
         problematic
-    :type calendar: str
     :returns: clean vevent
-    :rtype: icalendar.cal.Event
     """
     # convert localized datetimes with timezone information we don't
     # understand to the default timezone
@@ -423,7 +423,7 @@ def sanitize(vevent, default_timezone, href='', calendar=''):
 
     # event with missing DTSTART
     if dtstart is None:
-        raise ValueError('Event has no start time (DTSTART).')
+        raise InvalidVevent('Event has no start time (DTSTART).')
     dtstart, dtend = sanitize_timerange(
         dtstart, dtend, duration=vevent.get('DURATION', None))
 
@@ -457,8 +457,9 @@ def sanitize_timerange(dtstart, dtend, duration=None):
         dtend = dtstart + dt.timedelta(days=1)
     elif dtend is not None:
         if dtend < dtstart:
-            raise ValueError('The event\'s end time (DTEND) is older than '
-                             'the event\'s start time (DTSTART).')
+            raise InvalidVevent(
+                "The event's end time (DTEND) is older than its start time (DTSTART)."
+            )
         elif dtend == dtstart:
             logger.warning(
                 "Event start time and end time are the same. "
@@ -625,7 +626,7 @@ def get_wrapped_text(widget):
     return widget.original_widget.get_edit_text()
 
 
-def cal_from_ics(ics):
+def cal_from_ics(ics: str) -> icalendar.Calendar:
     try:
         cal = icalendar.Calendar.from_ical(ics)
     except ValueError as error:

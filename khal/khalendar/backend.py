@@ -70,7 +70,7 @@ class SQLiteDb(object):
     def __init__(self,
                  calendars: Iterable[str],
                  db_path: Optional[str],
-                 locale: Dict[str, str],
+                 locale: Dict[str, Union[str, dt.tzinfo]],
                  ) -> None:
         assert db_path is not None
         self.calendars = calendars

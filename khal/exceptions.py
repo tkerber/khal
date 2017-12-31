@@ -54,3 +54,7 @@ class UnsupportedRecurrence(Error):
 
 class InvalidDate(Error):
     pass
+
+
+class InvalidVevent(Error):
+    pass
