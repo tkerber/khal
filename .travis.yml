@@ -6,7 +6,7 @@ python:
     - 3.4
     - 3.5
     - 3.6
-    - 3.7-dev
+    - 3.7
 
 env:
     - BUILD=py
@@ -19,6 +19,11 @@ matrix:
         env: BUILD=docs
       - python: 3.6
         env: BUILD=pytz201610
+      - python: 3.6
+        env: BUILD=dateutil26
+      - python: 3.6
+        env: BUILD=dateutil_latest
+
 
 addons:
     apt:
