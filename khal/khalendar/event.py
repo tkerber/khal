@@ -775,6 +775,10 @@ def create_timezone(tz, first_date=None, last_date=None):
     easy solution, we'd really need to ship another version of the OLSON DB.
 
     """
+
+    if last_date is None:
+        last_date = first_date + dt.timedelta(days=1)
+
     if isinstance(tz, pytz.tzinfo.StaticTzInfo):
         return _create_timezone_static(tz)
 
